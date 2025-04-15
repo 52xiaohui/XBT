@@ -21,12 +21,12 @@ const router = createRouter({
       component: LobbyView,
       children: [
         {
-          name: 'lobby-sign',
+          name: 'sign-lobby',
           path: 'sign',
           component: SignLobbyView,
         },
         {
-          name: 'lobby-user',
+          name: 'user-lobby',
           path: 'user',
           component: UserLobbyView,
         }
@@ -60,7 +60,7 @@ router.beforeEach((to, from) => {
     return { name: 'lobby' }
   }
   if (to.path === '/lobby') {
-    return { name: 'lobby-sign' }
+    return { name: 'sign-lobby' }
   }
 })
 

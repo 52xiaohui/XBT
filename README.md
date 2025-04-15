@@ -6,6 +6,9 @@
 ### 一人签到，全寝睡觉
 </div></center>
 
+> `temp-android-only` 分支由 `52xiaohui` pr，其对扫码签到场景进行了优化【[PR详情](https://github.com/EnderWolf006/XBT/pull/6)】，但因无法适配Web暂未合并至主分支。<br>
+> 同时，`XBT-Web` 原生实现正在开发中，使用 `Vue3` + `Varlet`，将大幅增加前端使用体验，敬请期待。
+
 ## 软件功能
 - 自动识别同班同学
 - 可选的代签生效课程

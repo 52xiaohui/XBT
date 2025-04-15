@@ -9,7 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@varlet/touch-emulator": "^3.10.3",
     "@varlet/ui": "^3.10.2",
+    "axios": "^1.8.4",
+    "encrypt": "^0.0.1",
+    "jsencrypt": "^3.3.2",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },

@@ -1,45 +1,63 @@
 <template>
   <div class="screen">
     <div class="body">
-      <RouterView />
+      <div class="content">
+        <RouterView />
+      </div>
     </div>
     <var-bottom-navigation v-model:active="active">
-      <var-bottom-navigation-item label="标签" icon="home" />
-      <var-bottom-navigation-item label="标签" icon="magnify" />
-      <var-bottom-navigation-item label="标签" icon="heart" />
-      <var-bottom-navigation-item label="标签" icon="account-circle" />
+      <var-bottom-navigation-item v-for="(item, index) in actives" :key="index" :name="item.name" :icon="item.icon"
+        :label="item.label" />
     </var-bottom-navigation>
   </div>
 
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
-function resetVhAndPx() {
-  document.body.style.height = `${window.innerHeight}px`
-  
-  console.log(window.innerHeight);
-}
-onMounted(() => {
-  window.addEventListener('resize', resetVhAndPx)
-  resetVhAndPx()
-})
+const actives = [
+  {
+    name: 'sign-lobby',
+    icon: 'home',
+    label: '签到',
+  },
+  {
+    name: 'user-lobby',
+    icon: 'account-circle',
+    label: '用户',
+  }
+]
+
+let router = useRouter();
+
+const active = ref('sign-lobby');
+
+watch(active, (newVal) => {
+  router.push({ name: newVal });
+});
 </script>
 
 <style scoped>
 .screen {
   display: flex;
   flex-direction: column;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   height: 100%;
   width: 100%;
 }
 
 .body {
   flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+  overflow: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 8px;
+  height: fit-content;
 }
 </style>

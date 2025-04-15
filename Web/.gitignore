@@ -1,3 +1,7 @@
+# XBT Sensitive files
+config.js
+*.pem
+
 # Logs
 logs
 *.log
