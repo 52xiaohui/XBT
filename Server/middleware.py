@@ -7,7 +7,7 @@ import utils.log
 import pymysql
 from student import Student
 
-VERSION = '1.1.0'
+VERSION = '1.1.2'
 
 log = utils.log.Log('Flask')
 
