@@ -7,6 +7,11 @@ export const padLeft = (num, length = 2, fill = '0') => {
 };
 
 export const getChineseStringByDatetime = (dateTime, now = null) => {
+  // 确保输入是有效的日期对象
+  if (!(dateTime instanceof Date) || isNaN(dateTime.getTime())) {
+    return '无效时间';
+  }
+
   now = now ?? new Date();
 
   const isSameDay = dateTime.getFullYear() === now.getFullYear() &&

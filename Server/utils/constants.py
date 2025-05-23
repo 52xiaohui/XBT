@@ -21,6 +21,13 @@ POOL = PooledDB(
 
 getActivesLimit = 6
 
+allowedProxyUrl = {
+  "https://photo.chaoxing.com/p/",
+  "http://photo.chaoxing.com/p/",
+  "https://p.ananas.chaoxing.com/star3",
+  "http://p.ananas.chaoxing.com/star3",
+}
+
 webFormHeaders = {
   'Content-Type': "application/x-www-form-urlencoded; charset=UTF-8",
   'User-Agent': "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
@@ -37,6 +44,11 @@ webHeader = {
 
 mobileHeader = {
   "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 14; Redmi K20 Pro Build/UKQ1.230804.001) (schild:0945de15614364966e17460057ab5aa6) (device:Redmi K20 Pro) Language/zh_CN com.chaoxing.mobile/ChaoXingStudy_3_6.4.8_android_phone_10834_264 (@Kalimdor)_aa664e5fbb1d46df8e5aa65f62a438d8"
+}
+
+imageHeaders = {
+  "Referer": "https://mooc1-1.chaoxing.com/",
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
 }
 
 

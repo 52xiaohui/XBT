@@ -6,7 +6,7 @@ import JSEncrypt from 'jsencrypt';
 // Alternatively, fetch it from a file
 async function loadPublicKey() {
   try {
-    const response = await fetch('/keys/public.pem'); // Adjust path as needed
+    const response = await fetch('/keys/public.pem'); // Adjust path as needed    
     return await response.text();
   } catch (error) {
     console.error('Error loading public key:', error);
@@ -18,7 +18,7 @@ export async function encodeString(content) {
   const encryptor = new JSEncrypt();
   
   // Use static key or fetch dynamically
-  encryptor.setPublicKey(publicKey); // Using static key
+  encryptor.setPublicKey(await loadPublicKey()); // Using static key
   // OR: encryptor.setPublicKey(await loadPublicKey()); // Dynamic loading
   
   return encryptor.encrypt(content); // Returns base64 encoded string

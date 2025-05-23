@@ -5,6 +5,7 @@ from student import *
 from requests.packages import urllib3
 from utils.aes import *
 from middleware import *
+from utils.constants import *
 
 urllib3.disable_warnings()
 warnings.filterwarnings("ignore")
@@ -271,5 +272,22 @@ def getSignStateFromDataBase():
       "msg": str(e),
     }
   
+@app.route('/imageProxy', methods=['GET'])
+def proxyImage():
+  url = request.args.get('url')
+  if not url:
+    return {
+      "suc": False,
+      "msg": "url is required"
+    }
+  if not any([url.startswith(proxyUrl) for proxyUrl in allowedProxyUrl]):
+    return {
+      "suc": False,
+      "msg": "url is not allowed"
+    }
+  response = requests.get(url, headers=imageHeaders, verify=False)
+  return response.content, response.status_code, {'Content-Type': response.headers.get('Content-Type')}
+
+
 if __name__ == "__main__":
   app.run(host='0.0.0.0', debug=True, port=3030)

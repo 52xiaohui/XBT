@@ -1,65 +1,174 @@
 <template>
-  <h2>课程列表</h2>
-  <var-paper elevation="2" class="paper">
-    <var-cell title="课程名字" description="教师名字" @click="() => { }" ripple>
+  <!-- appbar -->
+  <div style="display: flex;flex-direction: row;align-items: center;">
+    <h2 style="margin-right: 8px;">课程列表</h2>
+    <var-loading size="small" v-show="isLoading" />
+    <div style="flex: 1;"></div>
+    <var-button type="primary" text icon-container @click="routeToConfig">
+      <var-icon name="cog-outline" color="var(--color-primary)" />
+    </var-button>
+    <var-button type="primary" text icon-container @click="refreshPage">
+      <var-icon name="refresh" color="var(--color-primary)" />
+    </var-button>
+  </div>
+
+  <var-paper v-for="(clazz, index) in selectedClass" elevation="2" class="paper">
+    <var-cell :title="clazz.name"
+      :description="clazz.teacher.length > 24 ? clazz.teacher.substring(0, 16) + '...' : clazz.teacher"
+      @click="() => { classStates[index].expanded = !classStates[index].expanded }" ripple>
       <template #icon>
-        <var-image width="42px" height="42px" fit="cover" radius="4" src="https://varletjs.org/cat.jpg"
-          style="margin-right: 8px;" />
+        <div style="margin-right: 8px;">
+          <var-badge type="danger" :value="classStates[index].badgeCount" :hidden="classStates[index].badgeCount == 0">
+            <var-image width="42px" height="42px" fit="cover" radius="4" :src="proxyImage(clazz.icon)" />
+          </var-badge>
+        </div>
       </template>
       <template #extra>
-        <div class="cell-extra">8分钟前</div>
+        <div class="cell-extra">{{ clazz.actives.length > 0 ? getChineseStringByDatetime(new
+          Date(clazz.actives[0].startTime)) : '' }}</div>
       </template>
     </var-cell>
-    <var-divider margin="0"></var-divider>
-    <var-cell icon="map-marker" title="签到类型" description="签到状态" ripple>
-      <template #extra>
-        <div class="cell-extra">8分钟前</div>
+    <var-collapse-transition :expand="classStates[index].expanded">
+      <var-divider margin="0"></var-divider>
+      <template v-for="(active, activeIndex) in clazz.actives">
+        <var-cell :title="SignType.fromId(active.signType).name"
+          :description="activeStates[index][activeIndex].subtitle" ripple
+          :style="{ color: active.endTime > Date.now() ? 'var(--color-primary)' : undefined }"
+          @click="onActiveClick(clazz, active)">
+          <template #icon>
+            <div style="margin-right: 12px;">
+              <var-badge type="danger" dot :hidden="!activeStates[index][activeIndex].isBadge">
+                <var-icon :name="SignType.fromId(active.signType).icon"></var-icon>
+              </var-badge>
+            </div>
+          </template>
+          <template #extra>
+            <div class="cell-extra">
+              {{ getChineseStringByDatetime(new Date(active.startTime)) }}
+            </div>
+          </template>
+        </var-cell>
+        <var-divider margin="0" style="border-color: rgba(0,0,0,0.1);" hairline />
       </template>
-    </var-cell>
-    <var-cell icon="qrcode-scan" title="签到类型" description="签到状态" ripple>
-      <template #extra>
-        <div class="cell-extra">2025-04-01</div>
-      </template>
-    </var-cell>
+      <div v-if="classStates[index].triggeredLimit" class="no-more">仅显示最近{{ activesLimit }}条数据</div>
+      <div v-if="clazz.actives.length == 0" class="no-more">暂无签到活动</div>
+    </var-collapse-transition>
   </var-paper>
-
-
+  <div v-if="selectedClass.length == 0">暂无已选择课程！<br>请先点击右上角设置图标按钮选择需要开启代签的课程。<br>选课越少，加载越快，请确保仅选择上课可能会签到的课程！</div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
-let selectedClasses = reactive(
-  [
-    {
-      'expanded': false,
-      "actives": [
-        { "activeId": 7700223477089, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "22277402第25次课签到", "signRecord": { "signTime": 2743877788, "source": "self", "sourceName": "小明" }, "signType": 4, "startTime": 1743671311426 },
-        { "activeId": 7700223034249, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "22277332第29次课 签到", "signRecord": { "signTime": 2743388297, "source": "self", "sourceName": "小明" }, "signType": 4, "startTime": 1743671311426 },
-        { "activeId": 7700222742083, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "22283027第28次课签到", "signRecord": { "signTime": 2743062423, "source": "self", "sourceName": "小明" }, "signType": 4, "startTime": 1743671311426 },
-        { "activeId": 7700222863048, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "22277326第27次课签到", "signRecord": { "signTime": 2742976283, "source": "agent", "sourceName": "小明" }, "signType": 4, "startTime": 1743671311426 },
-        { "activeId": 7700222208283, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "22277324第26次课签到", "signRecord": { "signTime": 2742783383, "source": "self", "sourceName": "小明" }, "signType": 4, "startTime": 1743671311426 },
-        { "activeId": 7700222773468, "endTime": 1743671311426, "ifRefreshEwm": true, "name": "22277320第28次课签到", "signRecord": { "signTime": 2742487828, "source": "agent", "sourceName": "小明" }, "signType": 4, "startTime": 1743671311426 }
-      ], "classId": 224684288, "courseId": 249932822, "icon": "https://varletjs.org/cat.jpg", "isSelected": 2, "name": "高等数学A（2 ）", "teacher": "老师2"
-    },
-    {
-      'expanded': false,
-      "actives": [
-        { "activeId": 3000228939082, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "签到", "signRecord": { "signTime": 2742228822, "source": "self", "sourceName": "小明" }, "signType": 3, "startTime": 1743671311426 },
-        { "activeId": 3000228328262, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "签到", "signRecord": { "signTime": 2740963327, "source": "self", "sourceName": "小明" }, "signType": 3, "startTime": 1743671311426 },
-        { "activeId": 3000224300670, "endTime": 1743671311426, "ifRefreshEwm": false, "name": "签到", "signRecord": { "signTime": -2, "source": "none", "sourceName": "未签到" }, "signType": 3, "startTime": 1743671311426 }],
-      "classId": 224363239, "courseId": 249826428, "icon": "https://varletjs.org/cat.jpg", "isSelected": 2, "name": "大学物理A（2）/B", "teacher": "老师1"
+import router from '@/router';
+import api from '@/utils/api';
+import { activesLimit, proxyImage, SignType } from '@/utils/constants';
+import { getChineseStringByDatetime } from '@/utils/datetime';
+import { getSignSubtitle } from '@/utils/sign';
+import { Snackbar } from '@varlet/ui';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { useSelectedClassStore } from '@/stores/SelectedClassStore';
+import { storeToRefs } from 'pinia';
+
+const isLoading = ref(false);
+const selectedClassStore = useSelectedClassStore();
+const { selectedClass } = storeToRefs(selectedClassStore);
+
+// UI state management
+const classStates = reactive([]);
+const activeStates = reactive([]);
+
+// Watch for changes in selectedClass and update UI states
+watch(selectedClass, (newClasses) => {
+  if (!newClasses) return;
+
+  // Initialize or update class states
+  const oldClassStates = [...classStates];
+  classStates.splice(0, classStates.length);
+  activeStates.splice(0, activeStates.length);
+
+  newClasses.forEach((clazz, classIndex) => {
+    // Initialize class state
+    classStates.push({
+      expanded: classIndex < oldClassStates.length ? oldClassStates[classIndex].expanded : false,
+      triggeredLimit: clazz.actives.length > activesLimit,
+    });
+    
+    // Initialize active states for this class
+    const classActiveStates = [];
+    let badgeCount = 0;
+    clazz.actives = clazz.actives.slice(0, activesLimit);
+    clazz.actives.forEach((active) => {
+      const isBadge = active.endTime > Date.now() && active.signRecord.source == 'none'
+      classActiveStates.push({
+        subtitle: getSignSubtitle(active),
+        isActive: active.endTime > Date.now(),
+        isBadge
+      });
+      if (isBadge) badgeCount++;
+    });
+    classStates[classStates.length - 1].badgeCount = badgeCount;
+    activeStates.push(classActiveStates);
+  });
+}, { immediate: true });
+
+async function refreshPage() {
+  isLoading.value = true;
+  const resp = (await api.post('getSelectedCourseAndActivityList', {})).data;
+  if (!resp.suc) {
+    Snackbar({
+      type: 'warning',
+      content: resp.msg,
+      duration: 2000,
+    })
+    isLoading.value = false;
+    return;
+  }
+  // console.log(resp.data);
+
+  const _selectedClasses = JSON.parse(JSON.stringify(resp.data));
+  _selectedClasses.forEach((v, i) => {
+    for (let j = 0; j < v.actives.length; j++) {
+      v.actives[j].classId = v.classId;
+      v.actives[j].courseId = v.courseId;
     }
-  ]
-);
+  });
 
+  selectedClassStore.setSelectedClass(_selectedClasses);
+  isLoading.value = false;
+}
 
+onMounted(() => {
+  refreshPage();
+})
 
+function routeToConfig() {
+  router.push({
+    name: 'sign-config',
+  })
+}
+
+function onActiveClick(clazz, active) {
+  router.push({
+    name: 'sign-detail',
+    query: {
+      classId: clazz.classId,
+      activeId: active.activeId
+    }
+  });
+}
 </script>
+
 <style scoped>
 .paper {
   display: flex;
   flex-direction: column;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.no-more {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 12px;
+  padding: 3px;
 }
 </style>

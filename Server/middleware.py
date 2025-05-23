@@ -11,7 +11,8 @@ VERSION = '1.1.2'
 
 log = utils.log.Log('Flask')
 
-IGNORE_TOKEN_URL={'/login'}
+IGNORE_TOKEN_URL = set({'/login'})
+IGNORE_BEFORE_REQUEST = set({'/imageProxy'})
  
 def after_request(resp: Response):
   if (resp.json is not None):    
@@ -22,12 +23,14 @@ def after_request(resp: Response):
   return resp
  
 def before_request():
+  if any([request.path.startswith(url) for url in IGNORE_BEFORE_REQUEST]):
+    return
   conn = POOL.connection()
   cursor = conn.cursor(pymysql.cursors.DictCursor)
   version = request.headers.get('version')
   if not version or version != VERSION:
     return {'suc': False, 'msg': f'客户端版本过低, 请更新v{VERSION}'}
-  if request.path not in IGNORE_TOKEN_URL:
+  if not any([request.path.startswith(url) for url in IGNORE_TOKEN_URL]):
     token = request.headers.get('token')
     if not token or token == '':
       return {'suc': False, 'msg': 'Token is required'}, 403

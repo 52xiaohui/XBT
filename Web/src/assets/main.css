@@ -16,12 +16,6 @@ body {
   position: relative;
 }
 
-h1 {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 8px 0;
-}
-
 .cell-extra {
   white-space: nowrap;
   color: rgba(0, 0, 0, 0.5);

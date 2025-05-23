@@ -3,13 +3,8 @@
 import { config_baseURL, config_locationPreset, config_version } from "@/config";
 
 // baseURL 初始化
-export let baseURL = '';
+export let baseURL = localStorage.getItem('base_url') ?? config_baseURL;
 export const version = config_version;
-
-export async function initBaseURL() {
-  const storedURL = localStorage.getItem('base_url');
-  baseURL = storedURL ?? config_baseURL;
-}
 
 // 默认签到限制数量
 export const activesLimit = 5;
@@ -29,3 +24,9 @@ export const SignType = {
 
 // 位置预设数组
 export const locationPreset = config_locationPreset;
+
+const imageProxyPrefix = baseURL + '/imageProxy?url=';
+
+export const proxyImage = (url) => {
+  return imageProxyPrefix + encodeURIComponent(url);
+}

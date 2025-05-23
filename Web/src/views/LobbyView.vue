@@ -10,12 +10,11 @@
         :label="item.label" />
     </var-bottom-navigation>
   </div>
-
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const actives = [
   {
@@ -28,14 +27,33 @@ const actives = [
     icon: 'account-circle',
     label: '用户',
   }
-]
+];
 
-let router = useRouter();
+const router = useRouter();
+const route = useRoute();
 
-const active = ref('sign-lobby');
+const active = ref(route.name); // 初始化为当前路由名称
 
+// 监听 active 的变化并更新路由
 watch(active, (newVal) => {
-  router.push({ name: newVal });
+  if (newVal !== route.name) {
+    router.push({ name: newVal });
+  }
+});
+
+// 监听路由变化并更新 active
+watch(
+  () => route.name,
+  (newRouteName) => {
+    if (newRouteName !== active.value) {
+      active.value = newRouteName;
+    }
+  }
+);
+
+// 确保初始值同步
+onMounted(() => {
+  active.value = route.name;
 });
 </script>
 
